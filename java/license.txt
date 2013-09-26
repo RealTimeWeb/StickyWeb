@@ -1,0 +1,21 @@
+Apache HTTP Commons library
+	http://hc.apache.org/
+	Apache License 2.0
+
+JSON.simple
+	https://code.google.com/p/json-simple/
+	Apache License 2.0
+	
+OpenCSV
+	http://opencsv.sourceforge.net/
+	Apache 2.0 license
+	
+	
+XStream
+	http://xstream.codehaus.org/license.html
+	BSD License
+	
+Simple-XML
+	http://simple.sourceforge.net/home.php
+	Apache 2.0 license
+	
