@@ -8,6 +8,5 @@ Java
 ====
 
     StickyWeb connection = new StickyWeb();
-    StickyWebRequest request= connection.get("url", ...);
-    StickyWebResponse response = request.setOnline(false).execute();
+    StickyWebResponse response= connection.get("url", ...).setOnline(false).execute();
     System.out.println(response.asText());
