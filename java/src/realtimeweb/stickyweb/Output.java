@@ -18,6 +18,35 @@ class Output {
 	private Pattern pattern;
 	
 	/**
+	 * Change the pattern for the data.
+	 * @param pattern
+	 */
+	public void setPattern(Pattern pattern) {
+		this.pattern = pattern;
+	}
+	
+	/**
+	 * Creates a new Output without any data.
+	 * @param pattern
+	 */
+	Output(Pattern pattern) {
+		this.clock = 0;
+		this.pattern = pattern;
+		this.data = new ArrayList<String>();
+	}
+	
+	/**
+	 * 
+	 * @param pattern
+	 * @param data The string data (without a pattern as the first element)
+	 */
+	public Output(Pattern pattern, ArrayList<String> data) {
+		this.clock = 0;
+		this.pattern = pattern;
+		this.data = data;
+	}
+
+	/**
 	 * Returns the current data, based on the clock. If there is no more data,
 	 * then the result is returned based on the pattern:<ul>
 	 * 	<li>RESTART: turn the clock back to 0 and return first result.</li>
@@ -56,5 +85,27 @@ class Output {
 	 */
 	void reset() {
 		clock = 0;
+	}
+
+	public void removeData(int index) {
+		this.data.remove(index);
+	}
+
+	public void removeAllData() {
+		this.data.clear();
+	}
+
+	public String get(int index) {
+		return this.data.get(index);
+	}
+
+	public List<String> getAll() {
+		return this.data;
+	}
+
+	public ArrayList<String> recombine() {
+		ArrayList<String> output = new ArrayList<String>(this.data);
+		output.add(0, this.pattern.toString().toLowerCase());
+		return output;
 	}
 }

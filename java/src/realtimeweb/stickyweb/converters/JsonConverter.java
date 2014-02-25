@@ -52,7 +52,6 @@ public class JsonConverter {
 	@SuppressWarnings("unchecked")
 	public static Map<String, Object> convertToMap(String input) throws StickyWebJsonResponseParseException {
 		try {
-			System.out.println(input);
 			return (Map<String, Object>) jsonParser.parse(input,
 					CONTAINER_FACTORY);
 		} catch (ParseException e) {

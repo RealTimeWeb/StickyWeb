@@ -16,15 +16,15 @@ import realtimeweb.stickyweb.exceptions.StickyWebNotInCacheException;
 
 class LocalCache {
 
-	private HashMap<String, Output> data;
-	private Pattern pattern;
+	protected HashMap<String, Output> data;
+	protected HashMap<String, Object> metadata;
 
 	/**
 	 * Creates a new, empty LocalCache
 	 */
 	LocalCache() {
 		data = new HashMap<String, Output>();
-		pattern = Pattern.EMPTY;
+		metadata = new HashMap<String, Object>();
 	}
 
 	/**
@@ -53,7 +53,7 @@ class LocalCache {
 	 * @throws StickyWebDataSourceMalformedException
 	 */
 	@SuppressWarnings("unchecked")
-	void setDataSource(InputStream dataSource)
+	public void setDataSource(InputStream dataSource)
 			throws StickyWebDataSourceNotFoundException,
 			StickyWebDataSourceParseException, StickyWebLoadDataSourceException {
 		// Load the new data source into memory
@@ -67,6 +67,9 @@ class LocalCache {
 					"Unable to find \"data\" key in given Data Source.");
 		}
 		replaceData((Map<String, Object>) jsonData.get("data"));
+		if (jsonData.containsKey("metadata")) {
+			this.metadata = (HashMap<String, Object>) jsonData.get("metadata");
+		}
 	}
 
 	/**
@@ -189,20 +192,5 @@ class LocalCache {
 	 */
 	private void put(String key, ArrayList<String> value) {
 		data.put(key, new Output(value));
-	}
-
-	/**
-	 * @return the pattern
-	 */
-	public Pattern getPattern() {
-		return pattern;
-	}
-
-	/**
-	 * @param pattern
-	 *            the pattern to set
-	 */
-	public void setPattern(Pattern pattern) {
-		this.pattern = pattern;
 	}
 }
