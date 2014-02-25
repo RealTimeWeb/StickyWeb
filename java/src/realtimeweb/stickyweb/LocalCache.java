@@ -1,6 +1,5 @@
 package realtimeweb.stickyweb;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,84 +9,119 @@ import java.util.Map.Entry;
 import org.json.simple.parser.ParseException;
 
 import realtimeweb.stickyweb.converters.JsonConverter;
+import realtimeweb.stickyweb.exceptions.StickyWebDataSourceNotFoundException;
+import realtimeweb.stickyweb.exceptions.StickyWebDataSourceParseException;
+import realtimeweb.stickyweb.exceptions.StickyWebLoadDataSourceException;
 import realtimeweb.stickyweb.exceptions.StickyWebNotInCacheException;
 
-public class LocalCache {
-	
+class LocalCache {
+
 	private HashMap<String, Output> data;
-	
+	private Pattern pattern;
+
 	/**
 	 * Creates a new, empty LocalCache
 	 */
-	public LocalCache() {
+	LocalCache() {
 		data = new HashMap<String, Output>();
+		pattern = Pattern.EMPTY;
 	}
 
 	/**
 	 * Creates a new LocalCache from the InputStream
+	 * 
 	 * @param dataSource
-	 * @throws IOException
-	 * @throws ParseException
+	 * @throws StickyWebDataSourceNotFoundException
+	 * @throws StickyWebLoadDataSourceException
+	 * @throws StickyWebParseException
+	 * @throws StickyWebDataSourceMalformedException
 	 */
-	public LocalCache(InputStream dataSource) throws IOException, ParseException {
+	LocalCache(InputStream dataSource)
+			throws StickyWebDataSourceNotFoundException,
+			StickyWebDataSourceParseException, StickyWebLoadDataSourceException {
 		setDataSource(dataSource);
 	}
-	
+
 	/**
 	 * Replaces the data in the cache with the data in the InputStream.
+	 * 
 	 * @param dataSource
-	 * @throws IOException
-	 * @throws ParseException
+	 * 
+	 * @throws StickyWebDataSourceNotFoundException
+	 * @throws StickyWebLoadDataSourceException
+	 * @throws StickyWebParseException
+	 * @throws StickyWebDataSourceMalformedException
 	 */
 	@SuppressWarnings("unchecked")
-	public void setDataSource(InputStream dataSource) throws IOException, ParseException {
+	void setDataSource(InputStream dataSource)
+			throws StickyWebDataSourceNotFoundException,
+			StickyWebDataSourceParseException, StickyWebLoadDataSourceException {
 		// Load the new data source into memory
 		if (dataSource == null) {
-			throw new IOException("The given InputStream was null; check to make sure that the file exists.");
+			throw new StickyWebDataSourceNotFoundException(
+					"The given InputStream was null; check to make sure that the file exists.");
 		}
-		// TODO Wrap in StickyWebException
 		Map<String, Object> jsonData = JsonConverter.convertToMap(dataSource);
+		if (!jsonData.containsKey("data")) {
+			throw new StickyWebDataSourceParseException(
+					"Unable to find \"data\" key in given Data Source.");
+		}
 		replaceData((Map<String, Object>) jsonData.get("data"));
 	}
-	
+
 	/**
 	 * Completely resets the clock for each new output.
 	 */
-	public void reset() {
+	void reset() {
 		for (Output output : data.values()) {
 			output.reset();
 		}
 	}
-	
+
 	/**
 	 * Replaces the data in the cache with the data in the Map.
+	 * 
 	 * @param newData
 	 * @throws ParseException
+	 * @throws StickyWebDataSourceParseException
 	 */
-	@SuppressWarnings("unchecked")
-	private void replaceData(Map<String, Object> newData) throws ParseException {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void replaceData(Map<String, Object> newData)
+			throws StickyWebDataSourceParseException {
 		data = new HashMap<String, Output>();
 		for (Entry<String, Object> es : newData.entrySet()) {
 			if (es.getValue() instanceof ArrayList) {
-				put(es.getKey(), (ArrayList<String>)es.getValue());
+				for (Object o : (ArrayList) es.getValue()) {
+					if (!(o instanceof String)) {
+						throw new StickyWebDataSourceParseException(
+								"Input "
+										+ es.getValue()
+										+ " does not have a list of strings. One of the elements is "
+										+ o.getClass() + " (" + o + ").");
+					}
+				}
+				put(es.getKey(), (ArrayList<String>) es.getValue());
 			} else {
-				// TODO: Wrap in StickyWebException
-				throw new ParseException(0);
+				throw new StickyWebDataSourceParseException("Input "
+						+ es.getValue() + " does not have a list of strings.");
 			}
 		}
 	}
 
 	/**
-	 * Given a URL and its arguments, convert it to a hashable request
-	 * FIXME: I strongly suspect that this is insufficient. If anyone knows of a better 
+	 * Given a URL and its arguments, convert it to a hashable request FIXME: I
+	 * strongly suspect that this is insufficient. If anyone knows of a better
 	 * library to uniformly hash requests, please let me know.
+	 * 
 	 * @param url
 	 * @param query_arguments
-	 * @param indices 
+	 * @param indices
 	 * @return
 	 */
-	private static String hashRequest(String url, Map<String, String> query_arguments, ArrayList<String> indices) {
+	public static String hashRequest(String url,
+			Map<String, String> query_arguments, ArrayList<String> indices) {
 		StringBuilder completeQuery = new StringBuilder(url);
+		completeQuery.append("?");
 		if (!indices.isEmpty() || (indices == null && query_arguments != null)) {
 			ArrayList<String> actualIndices;
 			if (indices == null) {
@@ -95,45 +129,50 @@ public class LocalCache {
 			} else {
 				actualIndices = indices;
 			}
-			completeQuery.append("?");
 			for (String key : actualIndices) {
-				completeQuery.append(key + "=" + query_arguments.get(key) + "&");
+				completeQuery
+						.append(key + "=" + query_arguments.get(key) + "&");
 			}
-			// If empty list, remove ?
-			// Otherwise, remove trailing &
-			completeQuery.deleteCharAt(completeQuery.length()-1);
+			// Remove any trailing &
+			if (!indices.isEmpty()) {
+				completeQuery.deleteCharAt(completeQuery.length() - 1);
+			}
 		}
 		return completeQuery.toString();
 	}
 
 	/**
 	 * Retrieves an element from the LocalCache.
+	 * 
 	 * @param url
 	 * @param arguments
-	 * @param indices 
-	 * @param pattern
+	 * @param indices
 	 * @return
-	 * @throws StickyWebNotInCacheException if the element is not in the cache.
+	 * @throws StickyWebNotInCacheException
+	 *             if the element is not in the cache.
 	 */
-	public String get(String url, Map<String, String> arguments, ArrayList<String> indices, Pattern pattern) throws StickyWebNotInCacheException {
+	String get(String url, Map<String, String> arguments,
+			ArrayList<String> indices) throws StickyWebNotInCacheException {
 		String request = hashRequest(url, arguments, indices);
 		if (data.containsKey(request)) {
-			return data.get(request).get(pattern);
+			return data.get(request).get();
 		} else {
 			throw new StickyWebNotInCacheException(request);
 		}
 	}
-	
+
 	/**
 	 * Returns whether there are more elements for this request.
+	 * 
 	 * @param url
 	 * @param arguments
 	 * @param indices
 	 * @param pattern
 	 * @return
-	 * @throws StickyWebNotInCacheException 
+	 * @throws StickyWebNotInCacheException
 	 */
-	public boolean hasMore(String url, Map<String, String> arguments, ArrayList<String> indices, Pattern pattern) throws StickyWebNotInCacheException {
+	boolean hasMore(String url, Map<String, String> arguments,
+			ArrayList<String> indices) throws StickyWebNotInCacheException {
 		String request = hashRequest(url, arguments, indices);
 		if (data.containsKey(request)) {
 			return data.get(request).hasMore();
@@ -141,13 +180,29 @@ public class LocalCache {
 			throw new StickyWebNotInCacheException(request);
 		}
 	}
-	
+
 	/**
 	 * Store this new list of outputs into the cache.
+	 * 
 	 * @param key
 	 * @param value
 	 */
 	private void put(String key, ArrayList<String> value) {
 		data.put(key, new Output(value));
+	}
+
+	/**
+	 * @return the pattern
+	 */
+	public Pattern getPattern() {
+		return pattern;
+	}
+
+	/**
+	 * @param pattern
+	 *            the pattern to set
+	 */
+	public void setPattern(Pattern pattern) {
+		this.pattern = pattern;
 	}
 }

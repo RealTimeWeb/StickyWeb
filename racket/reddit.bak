@@ -1,0 +1,5 @@
+#lang racket
+; Define the structs
+(define-struct post (ups downs created subreddit id title author text? nsfw? content permalink))
+
+(define-struct comment (ups downs created subreddit id author body body-html replies))

@@ -5,34 +5,69 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.Map;
 
-import org.json.simple.parser.ParseException;
+import org.scribe.builder.ServiceBuilder;
+import org.scribe.model.Token;
+import org.scribe.oauth.OAuthService;
+
+import realtimeweb.stickyweb.exceptions.StickyWebDataSourceNotFoundException;
+import realtimeweb.stickyweb.exceptions.StickyWebDataSourceParseException;
+import realtimeweb.stickyweb.exceptions.StickyWebLoadDataSourceException;
 
 public class StickyWeb {
-	
+
 	private LocalCache cache;
-	
+	private Token accessToken;
+	private OAuthService service;
+
 	public StickyWeb() {
 		cache = new LocalCache();
+		accessToken = null;
+		service = null;
 	}
-	
-	public StickyWeb(InputStream dataSource) throws IOException, ParseException {
-		cache = new LocalCache(dataSource);
+
+	public StickyWeb(InputStream dataSource)
+			throws StickyWebDataSourceNotFoundException,
+			StickyWebDataSourceParseException, StickyWebLoadDataSourceException {
+		if (dataSource != null) {
+			cache = new LocalCache(dataSource);
+		} else {
+			cache = null;
+		}
+		accessToken = null;
+		service = null;
 	}
-	
-	public StickyWebRequest get(String url, Map<String, String> arguments) throws IllegalStateException, IOException, URISyntaxException {
-		return new StickyWebRequest(url, arguments, cache, Protocol.GET);
+
+	public StickyWeb setAuthentication(String consumerKey,
+			String consumerSecret, String token, String tokenSecret) {
+		this.service = new ServiceBuilder()
+				.provider(ServiceAuthentication.class).apiKey(consumerKey)
+				.apiSecret(consumerSecret).build();
+		this.accessToken = new Token(token, tokenSecret);
+		return this;
 	}
-	
-	public StickyWebRequest post(String url, Map<String, String> arguments) throws IllegalStateException, IOException, URISyntaxException {
-		return new StickyWebRequest(url, arguments, cache, Protocol.POST);
+
+	public StickyWebRequest get(String url, Map<String, String> arguments)
+			throws IllegalStateException, IOException, URISyntaxException {
+		return new StickyWebRequest(url, arguments, cache, Protocol.GET,
+				service, accessToken);
 	}
-	
-	public StickyWebRequest delete(String url, Map<String, String> arguments) throws IllegalStateException, IOException, URISyntaxException {
-		return new StickyWebRequest(url, arguments, cache, Protocol.DELETE);
+
+	public StickyWebRequest post(String url, Map<String, String> arguments)
+			throws IllegalStateException, IOException, URISyntaxException {
+		return new StickyWebRequest(url, arguments, cache, Protocol.POST,
+				service, accessToken);
 	}
-	
-	public StickyWebRequest PUT(String url, Map<String, String> arguments) throws IllegalStateException, IOException, URISyntaxException {
-		return new StickyWebRequest(url, arguments, cache, Protocol.PUT);
+
+	public StickyWebRequest delete(String url, Map<String, String> arguments)
+			throws IllegalStateException, IOException, URISyntaxException {
+		return new StickyWebRequest(url, arguments, cache, Protocol.DELETE,
+				service, accessToken);
+	}
+
+	public StickyWebRequest put(String url, Map<String, String> arguments)
+			throws IllegalStateException, IOException, URISyntaxException {
+		return new StickyWebRequest(url, arguments, cache, Protocol.PUT,
+				service, accessToken);
 	}
 
 }

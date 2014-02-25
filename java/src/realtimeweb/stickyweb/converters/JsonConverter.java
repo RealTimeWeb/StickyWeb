@@ -13,6 +13,10 @@ import org.json.simple.parser.ContainerFactory;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import realtimeweb.stickyweb.exceptions.StickyWebDataSourceParseException;
+import realtimeweb.stickyweb.exceptions.StickyWebJsonResponseParseException;
+import realtimeweb.stickyweb.exceptions.StickyWebLoadDataSourceException;
+
 /**
  * An internal class that provides a convenient converter for JSON formatted
  * data. This class will convert JSON maps to HashMaps and JSON lists to
@@ -42,31 +46,46 @@ public class JsonConverter {
 	 * Given a string of JSON data, convert it to a Map.
 	 * @param input
 	 * @return
+	 * @throws StickyWebJsonResponseParseException 
 	 * @throws ParseException
 	 */
 	@SuppressWarnings("unchecked")
-	public static Map<String, Object> convertToMap(String input)
-			throws ParseException {
-		return (Map<String, Object>) jsonParser.parse(input,
-				CONTAINER_FACTORY);
+	public static Map<String, Object> convertToMap(String input) throws StickyWebJsonResponseParseException {
+		try {
+			System.out.println(input);
+			return (Map<String, Object>) jsonParser.parse(input,
+					CONTAINER_FACTORY);
+		} catch (ParseException e) {
+			throw new StickyWebJsonResponseParseException(e.getMessage());
+		}
 	}
 
 	/**
 	 * Given a string of JSON data, convert it to a List.
 	 * @param input
 	 * @return
+	 * @throws StickyWebJsonResponseParseException 
 	 * @throws ParseException
 	 */
 	@SuppressWarnings("unchecked")
-	public static List<Object> convertToList(String input)
-			throws ParseException {
-		return (List<Object>) jsonParser.parse(input,
-				CONTAINER_FACTORY);
+	public static List<Object> convertToList(String input) throws StickyWebJsonResponseParseException {
+		try {
+			return (List<Object>) jsonParser.parse(input,
+					CONTAINER_FACTORY);
+		} catch (ParseException e) {
+			throw new StickyWebJsonResponseParseException(e.getMessage());
+		}
 	}
 	
-	public static Map<String, Object> convertToMap(InputStream file) throws IOException, ParseException {
-		StringWriter writer = new StringWriter();
-		IOUtils.copy(file, writer);
-		return convertToMap(writer.toString());
+	public static Map<String, Object> convertToMap(InputStream file) throws StickyWebDataSourceParseException, StickyWebLoadDataSourceException {
+		try {
+			StringWriter writer = new StringWriter();
+			IOUtils.copy(file, writer);
+			return convertToMap(writer.toString());
+		} catch (StickyWebJsonResponseParseException pe) {
+			throw new StickyWebDataSourceParseException("Couldn't parse InputStream " + file.toString() + ". " + pe.getMessage());
+		} catch (IOException ioe) {
+			throw new StickyWebLoadDataSourceException("Couldn't load InputStream "+ file.toString() + ". " + ioe.getMessage());
+		}
 	}
 }

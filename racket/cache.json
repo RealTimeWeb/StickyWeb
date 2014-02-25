@@ -1,0 +1,22 @@
+{
+    "library": "Weather library",
+    "name": "Bad weather",
+    "description": "This dataset contains lots of really bad weather.",
+    "version": 1.0,
+    "author": "acbart",
+    "contact": "acbart@vt.edu",
+    "data": {
+        "http://imgur.com" : ["repeat", "test.png", "test.png", "missing.png"],
+        "empty-3" : ["empty", "1", "2", "3"],
+		"loop-3" : ["loop", "1", "2", "3"],
+		"repeat-3" : ["repeat", "1", "2", "3"],
+		"empty-1" : ["empty", "1"],
+		"loop-1" : ["loop", "1"],
+		"repeat-1" : ["repeat", "1"],
+		"empty-0" : ["empty"],
+		"loop-0" : ["loop"],
+		"repeat-0" : ["repeat"],
+        "test.png": ["loop", "only data"],
+        "missing.png": ["loop", "other data"]
+    }
+}

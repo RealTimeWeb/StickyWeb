@@ -1,6 +1,7 @@
 package realtimeweb.stickyweb;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -18,40 +20,84 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.scribe.model.OAuthRequest;
+import org.scribe.model.Token;
+import org.scribe.model.Verb;
+import org.scribe.oauth.OAuthService;
 
-public class WebConnection {
+import realtimeweb.stickyweb.exceptions.StickyWebInternetException;
+
+class WebConnection {
+	
+	private static DefaultHttpClient httpclient = new DefaultHttpClient();
+	
+	private static String execute(HttpUriRequest service) throws StickyWebInternetException {
+		// Execute get request
+		try {
+			HttpResponse response = httpclient.execute((HttpUriRequest) service);
+			return EntityUtils.toString(response.getEntity());
+		} catch (IOException ioe) {
+			throw new StickyWebInternetException(ioe.getMessage());
+		}
+	}
+	
+	private static Map<String, String> cleanArguments(Map<String, String> arguments) {
+		if (arguments == null) {
+			return new HashMap<String, String>();
+		} else {
+			return arguments;
+		}
+	}
 
 	/**
 	 * In the interests of simplicity, we assume only Query parameters are used, rather than Form (like with POST).
 	 * @param url
 	 * @param arguments
+	 * @param accessToken 
+	 * @param service2 
 	 * @return
 	 * @throws IllegalStateException
 	 * @throws IOException
 	 * @throws URISyntaxException
+	 * @throws StickyWebInternetException 
 	 */
-	public static String get(String url, Map<String, String> arguments) throws IllegalStateException, IOException, URISyntaxException {
-		if (arguments == null) {
-			arguments = new HashMap<String, String>();
+	static String get(String url, Map<String, String> arguments, OAuthService oauthService, Token accessToken) throws IllegalStateException, IOException, URISyntaxException, StickyWebInternetException {
+		arguments = cleanArguments(arguments);
+		if (oauthService == null) {
+			HttpGet service= new HttpGet(url);
+			((HttpRequestBase) service).setURI(buildQueryString(service.getURI(), arguments));
+			return execute(service);
+		} else {
+			OAuthRequest request = new OAuthRequest(Verb.GET, url);
+			for (Entry<String, String> argument: arguments.entrySet()) {
+	            String key = argument.getKey();
+	            String value = argument.getValue();
+	            request.addQuerystringParameter(key, value);
+	        }
+	        oauthService.signRequest(accessToken, request);
+	        return request.send().getBody();
 		}
-		DefaultHttpClient httpclient = new DefaultHttpClient();
-		HttpGet service= new HttpGet(url);
-
-		// Build query string
-		URIBuilder ub = new URIBuilder(service.getURI());
+	}
+	
+	private static URI buildQueryString(URI uri, Map<String, String> arguments) throws URISyntaxException {
+		URIBuilder ub = new URIBuilder(uri);
 		for (Entry<String, String> qa : arguments.entrySet()) {
 			ub.addParameter(qa.getKey(), qa.getValue());
 		}
-		URI uri = ub.build();
-		((HttpRequestBase) service).setURI(uri);
-
-		// Execute get request
-		HttpResponse response = httpclient.execute(service);
-		return EntityUtils.toString(response.getEntity());
+		return ub.build();
+	}
+	
+	private static HttpEntity buildEntity(Map<String, String> arguments) throws UnsupportedEncodingException {
+		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+		for (Entry<String, String> ba : arguments.entrySet()) {
+			nameValuePairs.add(new BasicNameValuePair(ba.getKey(), ba.getValue()));
+		}
+		return new UrlEncodedFormEntity(nameValuePairs);
 	}
 
 	/**
@@ -62,24 +108,13 @@ public class WebConnection {
 	 * @throws IllegalStateException
 	 * @throws IOException
 	 * @throws URISyntaxException
+	 * @throws StickyWebInternetException 
 	 */
-	public static String post(String url, Map<String, String> arguments) throws IllegalStateException, IOException, URISyntaxException {
-		if (arguments == null) {
-			arguments = new HashMap<String, String>();
-		}
-		DefaultHttpClient httpclient = new DefaultHttpClient();
+	static String post(String url, Map<String, String> arguments, OAuthService oauthService, Token accessToken) throws IllegalStateException, IOException, URISyntaxException, StickyWebInternetException {
+		arguments = cleanArguments(arguments);		
 		HttpPost service= new HttpPost(url);
-
-		// Build body
-		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-		for (Entry<String, String> ba : arguments.entrySet()) {
-			nameValuePairs.add(new BasicNameValuePair(ba.getKey(), ba.getValue()));
-		}
-		service.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-
-		// Execute post request
-		HttpResponse response = httpclient.execute(service);
-		return EntityUtils.toString(response.getEntity());
+		service.setEntity(buildEntity(arguments));
+		return execute(service);
 	}
 	
 	/**
@@ -90,24 +125,13 @@ public class WebConnection {
 	 * @throws URISyntaxException
 	 * @throws ClientProtocolException
 	 * @throws IOException
+	 * @throws StickyWebInternetException 
 	 */
-	public static String delete(String url, Map<String, String> arguments) throws URISyntaxException, ClientProtocolException, IOException {
-		if (arguments == null) {
-			arguments = new HashMap<String, String>();
-		}
-		DefaultHttpClient httpclient = new DefaultHttpClient();
+	static String delete(String url, Map<String, String> arguments, OAuthService oauthService, Token accessToken) throws URISyntaxException, ClientProtocolException, IOException, StickyWebInternetException {
+		arguments = cleanArguments(arguments);
 		HttpDelete service= new HttpDelete(url);
-		// Build query string
-		URIBuilder ub = new URIBuilder(service.getURI());
-		for (Entry<String, String> qa : arguments.entrySet()) {
-			ub.addParameter(qa.getKey(), qa.getValue());
-		}
-		URI uri = ub.build();
-		((HttpRequestBase) service).setURI(uri);
-
-		// Execute get request
-		HttpResponse response = httpclient.execute(service);
-		return EntityUtils.toString(response.getEntity());
+		((HttpRequestBase) service).setURI(buildQueryString(service.getURI(), arguments));
+		return execute(service);
 	}
 	
 	/**
@@ -118,24 +142,13 @@ public class WebConnection {
 	 * @throws URISyntaxException
 	 * @throws ClientProtocolException
 	 * @throws IOException
+	 * @throws StickyWebInternetException 
 	 */
-	public static String put(String url, Map<String, String> arguments) throws URISyntaxException, ClientProtocolException, IOException {
-		if (arguments == null) {
-			arguments = new HashMap<String, String>();
-		}
-		DefaultHttpClient httpclient = new DefaultHttpClient();
+	static String put(String url, Map<String, String> arguments, OAuthService oauthService, Token accessToken) throws URISyntaxException, ClientProtocolException, IOException, StickyWebInternetException {
+		arguments = cleanArguments(arguments);
 		HttpPut service= new HttpPut(url);
-		// Build query string
-		URIBuilder ub = new URIBuilder(service.getURI());
-		for (Entry<String, String> qa : arguments.entrySet()) {
-			ub.addParameter(qa.getKey(), qa.getValue());
-		}
-		URI uri = ub.build();
-		((HttpRequestBase) service).setURI(uri);
-
-		// Execute get request
-		HttpResponse response = httpclient.execute(service);
-		return EntityUtils.toString(response.getEntity());
+		((HttpRequestBase) service).setURI(buildQueryString(service.getURI(), arguments));
+		return execute(service);
 	}
 
 }
