@@ -3,16 +3,16 @@
 <PRE>
 <FONT color="green">001</FONT>    package realtimeweb.stickyweb;<a name="line.1"></a>
 <FONT color="green">002</FONT>    <a name="line.2"></a>
-<FONT color="green">003</FONT>    import java.io.IOException;<a name="line.3"></a>
-<FONT color="green">004</FONT>    import java.net.URISyntaxException;<a name="line.4"></a>
-<FONT color="green">005</FONT>    import java.util.ArrayList;<a name="line.5"></a>
-<FONT color="green">006</FONT>    import java.util.Map;<a name="line.6"></a>
-<FONT color="green">007</FONT>    <a name="line.7"></a>
-<FONT color="green">008</FONT>    import org.scribe.model.Token;<a name="line.8"></a>
-<FONT color="green">009</FONT>    import org.scribe.oauth.OAuthService;<a name="line.9"></a>
-<FONT color="green">010</FONT>    <a name="line.10"></a>
-<FONT color="green">011</FONT>    import realtimeweb.stickyweb.exceptions.StickyWebDataSourceNotFoundException;<a name="line.11"></a>
-<FONT color="green">012</FONT>    import realtimeweb.stickyweb.exceptions.StickyWebInternetException;<a name="line.12"></a>
+<FONT color="green">003</FONT>    import java.util.ArrayList;<a name="line.3"></a>
+<FONT color="green">004</FONT>    import java.util.Map;<a name="line.4"></a>
+<FONT color="green">005</FONT>    <a name="line.5"></a>
+<FONT color="green">006</FONT>    import org.scribe.model.Token;<a name="line.6"></a>
+<FONT color="green">007</FONT>    import org.scribe.oauth.OAuthService;<a name="line.7"></a>
+<FONT color="green">008</FONT>    <a name="line.8"></a>
+<FONT color="green">009</FONT>    import realtimeweb.stickyweb.exceptions.StickyWebDataSourceNotFoundException;<a name="line.9"></a>
+<FONT color="green">010</FONT>    import realtimeweb.stickyweb.exceptions.StickyWebInternetException;<a name="line.10"></a>
+<FONT color="green">011</FONT>    import realtimeweb.stickyweb.exceptions.StickyWebInvalidPostArguments;<a name="line.11"></a>
+<FONT color="green">012</FONT>    import realtimeweb.stickyweb.exceptions.StickyWebInvalidQueryString;<a name="line.12"></a>
 <FONT color="green">013</FONT>    import realtimeweb.stickyweb.exceptions.StickyWebNotInCacheException;<a name="line.13"></a>
 <FONT color="green">014</FONT>    <a name="line.14"></a>
 <FONT color="green">015</FONT>    /**<a name="line.15"></a>
@@ -95,48 +95,47 @@
 <FONT color="green">092</FONT>             * local cache.<a name="line.92"></a>
 <FONT color="green">093</FONT>             * <a name="line.93"></a>
 <FONT color="green">094</FONT>             * @return<a name="line.94"></a>
-<FONT color="green">095</FONT>             * @throws IllegalStateException<a name="line.95"></a>
-<FONT color="green">096</FONT>             * @throws IOException<a name="line.96"></a>
-<FONT color="green">097</FONT>             * @throws URISyntaxException<a name="line.97"></a>
-<FONT color="green">098</FONT>             * @throws StickyWebNotInCacheException<a name="line.98"></a>
-<FONT color="green">099</FONT>             * @throws StickyWebInternetException<a name="line.99"></a>
-<FONT color="green">100</FONT>             */<a name="line.100"></a>
-<FONT color="green">101</FONT>            public synchronized StickyWebResponse execute()<a name="line.101"></a>
-<FONT color="green">102</FONT>                            throws IllegalStateException, IOException, URISyntaxException,<a name="line.102"></a>
-<FONT color="green">103</FONT>                            StickyWebNotInCacheException, StickyWebInternetException {<a name="line.103"></a>
-<FONT color="green">104</FONT>                    if (online) {<a name="line.104"></a>
-<FONT color="green">105</FONT>                            switch (protocol) {<a name="line.105"></a>
-<FONT color="green">106</FONT>                            default:<a name="line.106"></a>
-<FONT color="green">107</FONT>                            case GET:<a name="line.107"></a>
-<FONT color="green">108</FONT>                                    return new StickyWebResponse(WebConnection.get(url, arguments,<a name="line.108"></a>
-<FONT color="green">109</FONT>                                                    service, accessToken));<a name="line.109"></a>
-<FONT color="green">110</FONT>                            case POST:<a name="line.110"></a>
-<FONT color="green">111</FONT>                                    return new StickyWebResponse(WebConnection.post(url, arguments,<a name="line.111"></a>
-<FONT color="green">112</FONT>                                                    service, accessToken));<a name="line.112"></a>
-<FONT color="green">113</FONT>                            case PUT:<a name="line.113"></a>
-<FONT color="green">114</FONT>                                    return new StickyWebResponse(WebConnection.put(url, arguments,<a name="line.114"></a>
-<FONT color="green">115</FONT>                                                    service, accessToken));<a name="line.115"></a>
-<FONT color="green">116</FONT>                            case DELETE:<a name="line.116"></a>
-<FONT color="green">117</FONT>                                    return new StickyWebResponse(WebConnection.delete(url,<a name="line.117"></a>
-<FONT color="green">118</FONT>                                                    arguments, service, accessToken));<a name="line.118"></a>
-<FONT color="green">119</FONT>                            }<a name="line.119"></a>
-<FONT color="green">120</FONT>                    } else {<a name="line.120"></a>
-<FONT color="green">121</FONT>                            return new StickyWebResponse(<a name="line.121"></a>
-<FONT color="green">122</FONT>                                            cache.get(url, arguments, this.indices));<a name="line.122"></a>
-<FONT color="green">123</FONT>                    }<a name="line.123"></a>
-<FONT color="green">124</FONT>            }<a name="line.124"></a>
-<FONT color="green">125</FONT>    <a name="line.125"></a>
-<FONT color="green">126</FONT>            /**<a name="line.126"></a>
-<FONT color="green">127</FONT>             * Returns the internal hash of the url and its arguments that will be used<a name="line.127"></a>
-<FONT color="green">128</FONT>             * to look up the data in the cache.<a name="line.128"></a>
-<FONT color="green">129</FONT>             * <a name="line.129"></a>
-<FONT color="green">130</FONT>             * @return<a name="line.130"></a>
-<FONT color="green">131</FONT>             */<a name="line.131"></a>
-<FONT color="green">132</FONT>            public String getHashedRequest() {<a name="line.132"></a>
-<FONT color="green">133</FONT>                    return LocalCache.hashRequest(url, arguments, indices);<a name="line.133"></a>
-<FONT color="green">134</FONT>            }<a name="line.134"></a>
-<FONT color="green">135</FONT>    <a name="line.135"></a>
-<FONT color="green">136</FONT>    }<a name="line.136"></a>
+<FONT color="green">095</FONT>             * @throws StickyWebNotInCacheException<a name="line.95"></a>
+<FONT color="green">096</FONT>             * @throws StickyWebInternetException<a name="line.96"></a>
+<FONT color="green">097</FONT>             * @throws StickyWebInvalidQueryString<a name="line.97"></a>
+<FONT color="green">098</FONT>             * @throws StickyWebInvalidPostArguments<a name="line.98"></a>
+<FONT color="green">099</FONT>             */<a name="line.99"></a>
+<FONT color="green">100</FONT>            public synchronized StickyWebResponse execute()<a name="line.100"></a>
+<FONT color="green">101</FONT>                            throws StickyWebNotInCacheException, StickyWebInternetException,<a name="line.101"></a>
+<FONT color="green">102</FONT>                            StickyWebInvalidQueryString, StickyWebInvalidPostArguments {<a name="line.102"></a>
+<FONT color="green">103</FONT>                    if (online) {<a name="line.103"></a>
+<FONT color="green">104</FONT>                            switch (protocol) {<a name="line.104"></a>
+<FONT color="green">105</FONT>                            default:<a name="line.105"></a>
+<FONT color="green">106</FONT>                            case GET:<a name="line.106"></a>
+<FONT color="green">107</FONT>                                    return new StickyWebResponse(WebConnection.get(url, arguments,<a name="line.107"></a>
+<FONT color="green">108</FONT>                                                    service, accessToken));<a name="line.108"></a>
+<FONT color="green">109</FONT>                            case POST:<a name="line.109"></a>
+<FONT color="green">110</FONT>                                    return new StickyWebResponse(WebConnection.post(url, arguments,<a name="line.110"></a>
+<FONT color="green">111</FONT>                                                    service, accessToken));<a name="line.111"></a>
+<FONT color="green">112</FONT>                            case PUT:<a name="line.112"></a>
+<FONT color="green">113</FONT>                                    return new StickyWebResponse(WebConnection.put(url, arguments,<a name="line.113"></a>
+<FONT color="green">114</FONT>                                                    service, accessToken));<a name="line.114"></a>
+<FONT color="green">115</FONT>                            case DELETE:<a name="line.115"></a>
+<FONT color="green">116</FONT>                                    return new StickyWebResponse(WebConnection.delete(url,<a name="line.116"></a>
+<FONT color="green">117</FONT>                                                    arguments, service, accessToken));<a name="line.117"></a>
+<FONT color="green">118</FONT>                            }<a name="line.118"></a>
+<FONT color="green">119</FONT>                    } else {<a name="line.119"></a>
+<FONT color="green">120</FONT>                            return new StickyWebResponse(<a name="line.120"></a>
+<FONT color="green">121</FONT>                                            cache.get(url, arguments, this.indices));<a name="line.121"></a>
+<FONT color="green">122</FONT>                    }<a name="line.122"></a>
+<FONT color="green">123</FONT>            }<a name="line.123"></a>
+<FONT color="green">124</FONT>    <a name="line.124"></a>
+<FONT color="green">125</FONT>            /**<a name="line.125"></a>
+<FONT color="green">126</FONT>             * Returns the internal hash of the url and its arguments that will be used<a name="line.126"></a>
+<FONT color="green">127</FONT>             * to look up the data in the cache.<a name="line.127"></a>
+<FONT color="green">128</FONT>             * <a name="line.128"></a>
+<FONT color="green">129</FONT>             * @return<a name="line.129"></a>
+<FONT color="green">130</FONT>             */<a name="line.130"></a>
+<FONT color="green">131</FONT>            public String getHashedRequest() {<a name="line.131"></a>
+<FONT color="green">132</FONT>                    return LocalCache.hashRequest(url, arguments, indices);<a name="line.132"></a>
+<FONT color="green">133</FONT>            }<a name="line.133"></a>
+<FONT color="green">134</FONT>    <a name="line.134"></a>
+<FONT color="green">135</FONT>    }<a name="line.135"></a>
 
 
 

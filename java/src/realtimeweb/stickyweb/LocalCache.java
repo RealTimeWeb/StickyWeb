@@ -94,16 +94,30 @@ class LocalCache {
 		data = new HashMap<String, Output>();
 		for (Entry<String, Object> es : newData.entrySet()) {
 			if (es.getValue() instanceof ArrayList) {
-				for (Object o : (ArrayList) es.getValue()) {
-					if (!(o instanceof String)) {
-						throw new StickyWebDataSourceParseException(
-								"Input "
-										+ es.getValue()
-										+ " does not have a list of strings. One of the elements is "
-										+ o.getClass() + " (" + o + ").");
+				ArrayList values = (ArrayList) es.getValue();
+				if (values.size() == 0) {
+					this.data.put(es.getKey(), new Output(new ArrayList<String>()));
+				} else if (values.size() == 1 && values.get(0) instanceof String) {
+					this.data.put(es.getKey(), new Output((ArrayList<String>) values.get(0)));
+				} else {
+					Output newOutput = new Output(Pattern.valueOf(values.get(0).toString().toUpperCase()));
+					for (Object o : values.subList(1, values.size())) {
+						if (o == null) {
+							throw new StickyWebDataSourceParseException(
+									"Input "
+											+ es.getValue()
+											+ " does not have a list of strings. One of the elements is null.");
+						} else if (!(o instanceof String)) {
+							throw new StickyWebDataSourceParseException(
+									"Input "
+											+ es.getValue()
+											+ " does not have a list of strings. One of the elements is "
+											+ o.getClass() + " (" + o + ").");
+						}
+						newOutput.add(o.toString());
 					}
+					this.data.put(es.getKey(), newOutput);
 				}
-				put(es.getKey(), (ArrayList<String>) es.getValue());
 			} else {
 				throw new StickyWebDataSourceParseException("Input "
 						+ es.getValue() + " does not have a list of strings.");
@@ -182,15 +196,5 @@ class LocalCache {
 		} else {
 			throw new StickyWebNotInCacheException(request);
 		}
-	}
-
-	/**
-	 * Store this new list of outputs into the cache.
-	 * 
-	 * @param key
-	 * @param value
-	 */
-	private void put(String key, ArrayList<String> value) {
-		data.put(key, new Output(value));
 	}
 }

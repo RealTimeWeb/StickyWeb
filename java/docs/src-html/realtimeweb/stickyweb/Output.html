@@ -13,105 +13,123 @@
 <FONT color="green">010</FONT>             */<a name="line.10"></a>
 <FONT color="green">011</FONT>            Output(ArrayList&lt;String&gt; value) {<a name="line.11"></a>
 <FONT color="green">012</FONT>                    clock = 0;<a name="line.12"></a>
-<FONT color="green">013</FONT>                    pattern = Pattern.valueOf(value.get(0));<a name="line.13"></a>
-<FONT color="green">014</FONT>                    data = value.subList(1, value.size()-1);<a name="line.14"></a>
-<FONT color="green">015</FONT>            }<a name="line.15"></a>
-<FONT color="green">016</FONT>            private List&lt;String&gt; data;<a name="line.16"></a>
-<FONT color="green">017</FONT>            private int clock;<a name="line.17"></a>
-<FONT color="green">018</FONT>            private Pattern pattern;<a name="line.18"></a>
-<FONT color="green">019</FONT>            <a name="line.19"></a>
-<FONT color="green">020</FONT>            /**<a name="line.20"></a>
-<FONT color="green">021</FONT>             * Change the pattern for the data.<a name="line.21"></a>
-<FONT color="green">022</FONT>             * @param pattern<a name="line.22"></a>
-<FONT color="green">023</FONT>             */<a name="line.23"></a>
-<FONT color="green">024</FONT>            public void setPattern(Pattern pattern) {<a name="line.24"></a>
-<FONT color="green">025</FONT>                    this.pattern = pattern;<a name="line.25"></a>
-<FONT color="green">026</FONT>            }<a name="line.26"></a>
-<FONT color="green">027</FONT>            <a name="line.27"></a>
-<FONT color="green">028</FONT>            /**<a name="line.28"></a>
-<FONT color="green">029</FONT>             * Creates a new Output without any data.<a name="line.29"></a>
-<FONT color="green">030</FONT>             * @param pattern<a name="line.30"></a>
-<FONT color="green">031</FONT>             */<a name="line.31"></a>
-<FONT color="green">032</FONT>            Output(Pattern pattern) {<a name="line.32"></a>
-<FONT color="green">033</FONT>                    this.clock = 0;<a name="line.33"></a>
-<FONT color="green">034</FONT>                    this.pattern = pattern;<a name="line.34"></a>
-<FONT color="green">035</FONT>                    this.data = new ArrayList&lt;String&gt;();<a name="line.35"></a>
-<FONT color="green">036</FONT>            }<a name="line.36"></a>
-<FONT color="green">037</FONT>            <a name="line.37"></a>
-<FONT color="green">038</FONT>            /**<a name="line.38"></a>
-<FONT color="green">039</FONT>             * <a name="line.39"></a>
-<FONT color="green">040</FONT>             * @param pattern<a name="line.40"></a>
-<FONT color="green">041</FONT>             * @param data The string data (without a pattern as the first element)<a name="line.41"></a>
-<FONT color="green">042</FONT>             */<a name="line.42"></a>
-<FONT color="green">043</FONT>            public Output(Pattern pattern, ArrayList&lt;String&gt; data) {<a name="line.43"></a>
-<FONT color="green">044</FONT>                    this.clock = 0;<a name="line.44"></a>
-<FONT color="green">045</FONT>                    this.pattern = pattern;<a name="line.45"></a>
-<FONT color="green">046</FONT>                    this.data = data;<a name="line.46"></a>
-<FONT color="green">047</FONT>            }<a name="line.47"></a>
-<FONT color="green">048</FONT>    <a name="line.48"></a>
-<FONT color="green">049</FONT>            /**<a name="line.49"></a>
-<FONT color="green">050</FONT>             * Returns the current data, based on the clock. If there is no more data,<a name="line.50"></a>
-<FONT color="green">051</FONT>             * then the result is returned based on the pattern:&lt;ul&gt;<a name="line.51"></a>
-<FONT color="green">052</FONT>             *      &lt;li&gt;RESTART: turn the clock back to 0 and return first result.&lt;/li&gt;<a name="line.52"></a>
-<FONT color="green">053</FONT>             *  &lt;li&gt;REPEAT: turn the clock back to the final element and return it again.&lt;/li&gt;<a name="line.53"></a>
-<FONT color="green">054</FONT>             *  &lt;li&gt;EMPTY: return null, which should be turned into a relevant "empty" element.&lt;/li&gt;<a name="line.54"></a>
-<FONT color="green">055</FONT>             *  &lt;/ul&gt;<a name="line.55"></a>
-<FONT color="green">056</FONT>             * @param pattern<a name="line.56"></a>
-<FONT color="green">057</FONT>             * @return<a name="line.57"></a>
-<FONT color="green">058</FONT>             */<a name="line.58"></a>
-<FONT color="green">059</FONT>            String get() {<a name="line.59"></a>
-<FONT color="green">060</FONT>                    if (!hasMore()) {<a name="line.60"></a>
-<FONT color="green">061</FONT>                            switch (pattern) {<a name="line.61"></a>
-<FONT color="green">062</FONT>                            case EMPTY:<a name="line.62"></a>
-<FONT color="green">063</FONT>                                    return null;<a name="line.63"></a>
-<FONT color="green">064</FONT>                            case RESTART:<a name="line.64"></a>
-<FONT color="green">065</FONT>                                    clock = 0;<a name="line.65"></a>
-<FONT color="green">066</FONT>                                    break;<a name="line.66"></a>
-<FONT color="green">067</FONT>                            default: case REPEAT:<a name="line.67"></a>
-<FONT color="green">068</FONT>                                    clock = data.size()-1;<a name="line.68"></a>
-<FONT color="green">069</FONT>                                    break;<a name="line.69"></a>
-<FONT color="green">070</FONT>                            }<a name="line.70"></a>
-<FONT color="green">071</FONT>                    }<a name="line.71"></a>
-<FONT color="green">072</FONT>                    return data.get(clock++);<a name="line.72"></a>
-<FONT color="green">073</FONT>            }<a name="line.73"></a>
-<FONT color="green">074</FONT>            <a name="line.74"></a>
-<FONT color="green">075</FONT>            /**<a name="line.75"></a>
-<FONT color="green">076</FONT>             * Returns whether or not there are more items for this output.<a name="line.76"></a>
-<FONT color="green">077</FONT>             * @return<a name="line.77"></a>
-<FONT color="green">078</FONT>             */<a name="line.78"></a>
-<FONT color="green">079</FONT>            boolean hasMore() {<a name="line.79"></a>
-<FONT color="green">080</FONT>                    return clock &lt; data.size();<a name="line.80"></a>
-<FONT color="green">081</FONT>            }<a name="line.81"></a>
-<FONT color="green">082</FONT>            <a name="line.82"></a>
-<FONT color="green">083</FONT>            /**<a name="line.83"></a>
-<FONT color="green">084</FONT>             * Resets the clock on this input, so that it returns results from the beginning.<a name="line.84"></a>
-<FONT color="green">085</FONT>             */<a name="line.85"></a>
-<FONT color="green">086</FONT>            void reset() {<a name="line.86"></a>
-<FONT color="green">087</FONT>                    clock = 0;<a name="line.87"></a>
-<FONT color="green">088</FONT>            }<a name="line.88"></a>
-<FONT color="green">089</FONT>    <a name="line.89"></a>
-<FONT color="green">090</FONT>            public void removeData(int index) {<a name="line.90"></a>
-<FONT color="green">091</FONT>                    this.data.remove(index);<a name="line.91"></a>
-<FONT color="green">092</FONT>            }<a name="line.92"></a>
-<FONT color="green">093</FONT>    <a name="line.93"></a>
-<FONT color="green">094</FONT>            public void removeAllData() {<a name="line.94"></a>
-<FONT color="green">095</FONT>                    this.data.clear();<a name="line.95"></a>
-<FONT color="green">096</FONT>            }<a name="line.96"></a>
-<FONT color="green">097</FONT>    <a name="line.97"></a>
-<FONT color="green">098</FONT>            public String get(int index) {<a name="line.98"></a>
-<FONT color="green">099</FONT>                    return this.data.get(index);<a name="line.99"></a>
-<FONT color="green">100</FONT>            }<a name="line.100"></a>
-<FONT color="green">101</FONT>    <a name="line.101"></a>
-<FONT color="green">102</FONT>            public List&lt;String&gt; getAll() {<a name="line.102"></a>
-<FONT color="green">103</FONT>                    return this.data;<a name="line.103"></a>
-<FONT color="green">104</FONT>            }<a name="line.104"></a>
-<FONT color="green">105</FONT>    <a name="line.105"></a>
-<FONT color="green">106</FONT>            public ArrayList&lt;String&gt; recombine() {<a name="line.106"></a>
-<FONT color="green">107</FONT>                    ArrayList&lt;String&gt; output = new ArrayList&lt;String&gt;(this.data);<a name="line.107"></a>
-<FONT color="green">108</FONT>                    output.add(0, this.pattern.toString().toLowerCase());<a name="line.108"></a>
-<FONT color="green">109</FONT>                    return output;<a name="line.109"></a>
+<FONT color="green">013</FONT>                    pattern = Pattern.valueOf(value.get(0).toUpperCase());<a name="line.13"></a>
+<FONT color="green">014</FONT>                    if (value.size() == 1) {<a name="line.14"></a>
+<FONT color="green">015</FONT>                            data = new ArrayList&lt;String&gt;();<a name="line.15"></a>
+<FONT color="green">016</FONT>                    } else {<a name="line.16"></a>
+<FONT color="green">017</FONT>                            data = value.subList(1, value.size()-1);<a name="line.17"></a>
+<FONT color="green">018</FONT>                    }<a name="line.18"></a>
+<FONT color="green">019</FONT>            }<a name="line.19"></a>
+<FONT color="green">020</FONT>            private List&lt;String&gt; data;<a name="line.20"></a>
+<FONT color="green">021</FONT>            private int clock;<a name="line.21"></a>
+<FONT color="green">022</FONT>            private Pattern pattern;<a name="line.22"></a>
+<FONT color="green">023</FONT>            <a name="line.23"></a>
+<FONT color="green">024</FONT>            /**<a name="line.24"></a>
+<FONT color="green">025</FONT>             * Change the pattern for the data.<a name="line.25"></a>
+<FONT color="green">026</FONT>             * @param pattern<a name="line.26"></a>
+<FONT color="green">027</FONT>             */<a name="line.27"></a>
+<FONT color="green">028</FONT>            public void setPattern(Pattern pattern) {<a name="line.28"></a>
+<FONT color="green">029</FONT>                    this.pattern = pattern;<a name="line.29"></a>
+<FONT color="green">030</FONT>            }<a name="line.30"></a>
+<FONT color="green">031</FONT>            <a name="line.31"></a>
+<FONT color="green">032</FONT>            /**<a name="line.32"></a>
+<FONT color="green">033</FONT>             * Creates a new Output without any data.<a name="line.33"></a>
+<FONT color="green">034</FONT>             * @param pattern<a name="line.34"></a>
+<FONT color="green">035</FONT>             */<a name="line.35"></a>
+<FONT color="green">036</FONT>            Output(Pattern pattern) {<a name="line.36"></a>
+<FONT color="green">037</FONT>                    this.clock = 0;<a name="line.37"></a>
+<FONT color="green">038</FONT>                    this.pattern = pattern;<a name="line.38"></a>
+<FONT color="green">039</FONT>                    this.data = new ArrayList&lt;String&gt;();<a name="line.39"></a>
+<FONT color="green">040</FONT>            }<a name="line.40"></a>
+<FONT color="green">041</FONT>            <a name="line.41"></a>
+<FONT color="green">042</FONT>            /**<a name="line.42"></a>
+<FONT color="green">043</FONT>             * <a name="line.43"></a>
+<FONT color="green">044</FONT>             * @param pattern<a name="line.44"></a>
+<FONT color="green">045</FONT>             * @param data The string data (without a pattern as the first element)<a name="line.45"></a>
+<FONT color="green">046</FONT>             */<a name="line.46"></a>
+<FONT color="green">047</FONT>            public Output(Pattern pattern, ArrayList&lt;String&gt; data) {<a name="line.47"></a>
+<FONT color="green">048</FONT>                    this.clock = 0;<a name="line.48"></a>
+<FONT color="green">049</FONT>                    this.pattern = pattern;<a name="line.49"></a>
+<FONT color="green">050</FONT>                    this.data = data;<a name="line.50"></a>
+<FONT color="green">051</FONT>            }<a name="line.51"></a>
+<FONT color="green">052</FONT>    <a name="line.52"></a>
+<FONT color="green">053</FONT>            public Output(String data) {<a name="line.53"></a>
+<FONT color="green">054</FONT>                    this.clock = 0;<a name="line.54"></a>
+<FONT color="green">055</FONT>                    this.pattern = Pattern.REPEAT;<a name="line.55"></a>
+<FONT color="green">056</FONT>                    this.data = new ArrayList&lt;String&gt;();<a name="line.56"></a>
+<FONT color="green">057</FONT>                    this.data.add(data);<a name="line.57"></a>
+<FONT color="green">058</FONT>            }<a name="line.58"></a>
+<FONT color="green">059</FONT>    <a name="line.59"></a>
+<FONT color="green">060</FONT>            /**<a name="line.60"></a>
+<FONT color="green">061</FONT>             * Returns the current data, based on the clock. If there is no more data,<a name="line.61"></a>
+<FONT color="green">062</FONT>             * then the result is returned based on the pattern:&lt;ul&gt;<a name="line.62"></a>
+<FONT color="green">063</FONT>             *      &lt;li&gt;RESTART: turn the clock back to 0 and return first result.&lt;/li&gt;<a name="line.63"></a>
+<FONT color="green">064</FONT>             *  &lt;li&gt;REPEAT: turn the clock back to the final element and return it again.&lt;/li&gt;<a name="line.64"></a>
+<FONT color="green">065</FONT>             *  &lt;li&gt;EMPTY: return null, which should be turned into a relevant "empty" element.&lt;/li&gt;<a name="line.65"></a>
+<FONT color="green">066</FONT>             *  &lt;/ul&gt;<a name="line.66"></a>
+<FONT color="green">067</FONT>             * @param pattern<a name="line.67"></a>
+<FONT color="green">068</FONT>             * @return<a name="line.68"></a>
+<FONT color="green">069</FONT>             */<a name="line.69"></a>
+<FONT color="green">070</FONT>            String get() {<a name="line.70"></a>
+<FONT color="green">071</FONT>                    if (data.size() == 0) {<a name="line.71"></a>
+<FONT color="green">072</FONT>                            return null;<a name="line.72"></a>
+<FONT color="green">073</FONT>                    }<a name="line.73"></a>
+<FONT color="green">074</FONT>                    if (!hasMore()) {<a name="line.74"></a>
+<FONT color="green">075</FONT>                            switch (pattern) {<a name="line.75"></a>
+<FONT color="green">076</FONT>                            case EMPTY:<a name="line.76"></a>
+<FONT color="green">077</FONT>                                    return null;<a name="line.77"></a>
+<FONT color="green">078</FONT>                            case RESTART:<a name="line.78"></a>
+<FONT color="green">079</FONT>                                    clock = 0;<a name="line.79"></a>
+<FONT color="green">080</FONT>                                    break;<a name="line.80"></a>
+<FONT color="green">081</FONT>                            default: case REPEAT:<a name="line.81"></a>
+<FONT color="green">082</FONT>                                    clock = data.size()-1;<a name="line.82"></a>
+<FONT color="green">083</FONT>                                    break;<a name="line.83"></a>
+<FONT color="green">084</FONT>                            }<a name="line.84"></a>
+<FONT color="green">085</FONT>                    }<a name="line.85"></a>
+<FONT color="green">086</FONT>                    return data.get(clock++);<a name="line.86"></a>
+<FONT color="green">087</FONT>            }<a name="line.87"></a>
+<FONT color="green">088</FONT>            <a name="line.88"></a>
+<FONT color="green">089</FONT>            /**<a name="line.89"></a>
+<FONT color="green">090</FONT>             * Returns whether or not there are more items for this output.<a name="line.90"></a>
+<FONT color="green">091</FONT>             * @return<a name="line.91"></a>
+<FONT color="green">092</FONT>             */<a name="line.92"></a>
+<FONT color="green">093</FONT>            boolean hasMore() {<a name="line.93"></a>
+<FONT color="green">094</FONT>                    return clock &lt; data.size();<a name="line.94"></a>
+<FONT color="green">095</FONT>            }<a name="line.95"></a>
+<FONT color="green">096</FONT>            <a name="line.96"></a>
+<FONT color="green">097</FONT>            /**<a name="line.97"></a>
+<FONT color="green">098</FONT>             * Resets the clock on this input, so that it returns results from the beginning.<a name="line.98"></a>
+<FONT color="green">099</FONT>             */<a name="line.99"></a>
+<FONT color="green">100</FONT>            void reset() {<a name="line.100"></a>
+<FONT color="green">101</FONT>                    clock = 0;<a name="line.101"></a>
+<FONT color="green">102</FONT>            }<a name="line.102"></a>
+<FONT color="green">103</FONT>    <a name="line.103"></a>
+<FONT color="green">104</FONT>            public void removeData(int index) {<a name="line.104"></a>
+<FONT color="green">105</FONT>                    this.data.remove(index);<a name="line.105"></a>
+<FONT color="green">106</FONT>            }<a name="line.106"></a>
+<FONT color="green">107</FONT>    <a name="line.107"></a>
+<FONT color="green">108</FONT>            public void removeAllData() {<a name="line.108"></a>
+<FONT color="green">109</FONT>                    this.data.clear();<a name="line.109"></a>
 <FONT color="green">110</FONT>            }<a name="line.110"></a>
-<FONT color="green">111</FONT>    }<a name="line.111"></a>
+<FONT color="green">111</FONT>    <a name="line.111"></a>
+<FONT color="green">112</FONT>            public String get(int index) {<a name="line.112"></a>
+<FONT color="green">113</FONT>                    return this.data.get(index);<a name="line.113"></a>
+<FONT color="green">114</FONT>            }<a name="line.114"></a>
+<FONT color="green">115</FONT>    <a name="line.115"></a>
+<FONT color="green">116</FONT>            public List&lt;String&gt; getAll() {<a name="line.116"></a>
+<FONT color="green">117</FONT>                    return this.data;<a name="line.117"></a>
+<FONT color="green">118</FONT>            }<a name="line.118"></a>
+<FONT color="green">119</FONT>    <a name="line.119"></a>
+<FONT color="green">120</FONT>            public ArrayList&lt;String&gt; recombine() {<a name="line.120"></a>
+<FONT color="green">121</FONT>                    ArrayList&lt;String&gt; output = new ArrayList&lt;String&gt;(this.data);<a name="line.121"></a>
+<FONT color="green">122</FONT>                    output.add(0, this.pattern.toString().toLowerCase());<a name="line.122"></a>
+<FONT color="green">123</FONT>                    return output;<a name="line.123"></a>
+<FONT color="green">124</FONT>            }<a name="line.124"></a>
+<FONT color="green">125</FONT>    <a name="line.125"></a>
+<FONT color="green">126</FONT>            public void add(String data) {<a name="line.126"></a>
+<FONT color="green">127</FONT>                    this.data.add(data);<a name="line.127"></a>
+<FONT color="green">128</FONT>            }<a name="line.128"></a>
+<FONT color="green">129</FONT>    }<a name="line.129"></a>
 
 
 

@@ -1,8 +1,6 @@
 package realtimeweb.stickyweb;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.util.Map;
 
 import org.scribe.builder.ServiceBuilder;
@@ -46,26 +44,22 @@ public class StickyWeb {
 		return this;
 	}
 
-	public StickyWebRequest get(String url, Map<String, String> arguments)
-			throws IllegalStateException, IOException, URISyntaxException {
+	public StickyWebRequest get(String url, Map<String, String> arguments) {
 		return new StickyWebRequest(url, arguments, cache, Protocol.GET,
 				service, accessToken);
 	}
 
-	public StickyWebRequest post(String url, Map<String, String> arguments)
-			throws IllegalStateException, IOException, URISyntaxException {
+	public StickyWebRequest post(String url, Map<String, String> arguments) {
 		return new StickyWebRequest(url, arguments, cache, Protocol.POST,
 				service, accessToken);
 	}
 
-	public StickyWebRequest delete(String url, Map<String, String> arguments)
-			throws IllegalStateException, IOException, URISyntaxException {
+	public StickyWebRequest delete(String url, Map<String, String> arguments){
 		return new StickyWebRequest(url, arguments, cache, Protocol.DELETE,
 				service, accessToken);
 	}
 
-	public StickyWebRequest put(String url, Map<String, String> arguments)
-			throws IllegalStateException, IOException, URISyntaxException {
+	public StickyWebRequest put(String url, Map<String, String> arguments) {
 		return new StickyWebRequest(url, arguments, cache, Protocol.PUT,
 				service, accessToken);
 	}

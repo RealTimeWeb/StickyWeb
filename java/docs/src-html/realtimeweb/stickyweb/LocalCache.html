@@ -97,106 +97,110 @@
 <FONT color="green">094</FONT>                    data = new HashMap&lt;String, Output&gt;();<a name="line.94"></a>
 <FONT color="green">095</FONT>                    for (Entry&lt;String, Object&gt; es : newData.entrySet()) {<a name="line.95"></a>
 <FONT color="green">096</FONT>                            if (es.getValue() instanceof ArrayList) {<a name="line.96"></a>
-<FONT color="green">097</FONT>                                    for (Object o : (ArrayList) es.getValue()) {<a name="line.97"></a>
-<FONT color="green">098</FONT>                                            if (!(o instanceof String)) {<a name="line.98"></a>
-<FONT color="green">099</FONT>                                                    throw new StickyWebDataSourceParseException(<a name="line.99"></a>
-<FONT color="green">100</FONT>                                                                    "Input "<a name="line.100"></a>
-<FONT color="green">101</FONT>                                                                                    + es.getValue()<a name="line.101"></a>
-<FONT color="green">102</FONT>                                                                                    + " does not have a list of strings. One of the elements is "<a name="line.102"></a>
-<FONT color="green">103</FONT>                                                                                    + o.getClass() + " (" + o + ").");<a name="line.103"></a>
-<FONT color="green">104</FONT>                                            }<a name="line.104"></a>
-<FONT color="green">105</FONT>                                    }<a name="line.105"></a>
-<FONT color="green">106</FONT>                                    put(es.getKey(), (ArrayList&lt;String&gt;) es.getValue());<a name="line.106"></a>
-<FONT color="green">107</FONT>                            } else {<a name="line.107"></a>
-<FONT color="green">108</FONT>                                    throw new StickyWebDataSourceParseException("Input "<a name="line.108"></a>
-<FONT color="green">109</FONT>                                                    + es.getValue() + " does not have a list of strings.");<a name="line.109"></a>
-<FONT color="green">110</FONT>                            }<a name="line.110"></a>
-<FONT color="green">111</FONT>                    }<a name="line.111"></a>
-<FONT color="green">112</FONT>            }<a name="line.112"></a>
-<FONT color="green">113</FONT>    <a name="line.113"></a>
-<FONT color="green">114</FONT>            /**<a name="line.114"></a>
-<FONT color="green">115</FONT>             * Given a URL and its arguments, convert it to a hashable request FIXME: I<a name="line.115"></a>
-<FONT color="green">116</FONT>             * strongly suspect that this is insufficient. If anyone knows of a better<a name="line.116"></a>
-<FONT color="green">117</FONT>             * library to uniformly hash requests, please let me know.<a name="line.117"></a>
-<FONT color="green">118</FONT>             * <a name="line.118"></a>
-<FONT color="green">119</FONT>             * @param url<a name="line.119"></a>
-<FONT color="green">120</FONT>             * @param query_arguments<a name="line.120"></a>
-<FONT color="green">121</FONT>             * @param indices<a name="line.121"></a>
-<FONT color="green">122</FONT>             * @return<a name="line.122"></a>
-<FONT color="green">123</FONT>             */<a name="line.123"></a>
-<FONT color="green">124</FONT>            public static String hashRequest(String url,<a name="line.124"></a>
-<FONT color="green">125</FONT>                            Map&lt;String, String&gt; query_arguments, ArrayList&lt;String&gt; indices) {<a name="line.125"></a>
-<FONT color="green">126</FONT>                    StringBuilder completeQuery = new StringBuilder(url);<a name="line.126"></a>
-<FONT color="green">127</FONT>                    completeQuery.append("?");<a name="line.127"></a>
-<FONT color="green">128</FONT>                    if (!indices.isEmpty() || (indices == null &amp;&amp; query_arguments != null)) {<a name="line.128"></a>
-<FONT color="green">129</FONT>                            ArrayList&lt;String&gt; actualIndices;<a name="line.129"></a>
-<FONT color="green">130</FONT>                            if (indices == null) {<a name="line.130"></a>
-<FONT color="green">131</FONT>                                    actualIndices = new ArrayList&lt;String&gt;(query_arguments.keySet());<a name="line.131"></a>
-<FONT color="green">132</FONT>                            } else {<a name="line.132"></a>
-<FONT color="green">133</FONT>                                    actualIndices = indices;<a name="line.133"></a>
-<FONT color="green">134</FONT>                            }<a name="line.134"></a>
-<FONT color="green">135</FONT>                            for (String key : actualIndices) {<a name="line.135"></a>
-<FONT color="green">136</FONT>                                    completeQuery<a name="line.136"></a>
-<FONT color="green">137</FONT>                                                    .append(key + "=" + query_arguments.get(key) + "&amp;");<a name="line.137"></a>
-<FONT color="green">138</FONT>                            }<a name="line.138"></a>
-<FONT color="green">139</FONT>                            // Remove any trailing &amp;<a name="line.139"></a>
-<FONT color="green">140</FONT>                            if (!indices.isEmpty()) {<a name="line.140"></a>
-<FONT color="green">141</FONT>                                    completeQuery.deleteCharAt(completeQuery.length() - 1);<a name="line.141"></a>
-<FONT color="green">142</FONT>                            }<a name="line.142"></a>
-<FONT color="green">143</FONT>                    }<a name="line.143"></a>
-<FONT color="green">144</FONT>                    return completeQuery.toString();<a name="line.144"></a>
-<FONT color="green">145</FONT>            }<a name="line.145"></a>
-<FONT color="green">146</FONT>    <a name="line.146"></a>
-<FONT color="green">147</FONT>            /**<a name="line.147"></a>
-<FONT color="green">148</FONT>             * Retrieves an element from the LocalCache.<a name="line.148"></a>
-<FONT color="green">149</FONT>             * <a name="line.149"></a>
-<FONT color="green">150</FONT>             * @param url<a name="line.150"></a>
-<FONT color="green">151</FONT>             * @param arguments<a name="line.151"></a>
-<FONT color="green">152</FONT>             * @param indices<a name="line.152"></a>
-<FONT color="green">153</FONT>             * @return<a name="line.153"></a>
-<FONT color="green">154</FONT>             * @throws StickyWebNotInCacheException<a name="line.154"></a>
-<FONT color="green">155</FONT>             *             if the element is not in the cache.<a name="line.155"></a>
-<FONT color="green">156</FONT>             */<a name="line.156"></a>
-<FONT color="green">157</FONT>            String get(String url, Map&lt;String, String&gt; arguments,<a name="line.157"></a>
-<FONT color="green">158</FONT>                            ArrayList&lt;String&gt; indices) throws StickyWebNotInCacheException {<a name="line.158"></a>
-<FONT color="green">159</FONT>                    String request = hashRequest(url, arguments, indices);<a name="line.159"></a>
-<FONT color="green">160</FONT>                    if (data.containsKey(request)) {<a name="line.160"></a>
-<FONT color="green">161</FONT>                            return data.get(request).get();<a name="line.161"></a>
-<FONT color="green">162</FONT>                    } else {<a name="line.162"></a>
-<FONT color="green">163</FONT>                            throw new StickyWebNotInCacheException(request);<a name="line.163"></a>
-<FONT color="green">164</FONT>                    }<a name="line.164"></a>
-<FONT color="green">165</FONT>            }<a name="line.165"></a>
-<FONT color="green">166</FONT>    <a name="line.166"></a>
-<FONT color="green">167</FONT>            /**<a name="line.167"></a>
-<FONT color="green">168</FONT>             * Returns whether there are more elements for this request.<a name="line.168"></a>
-<FONT color="green">169</FONT>             * <a name="line.169"></a>
-<FONT color="green">170</FONT>             * @param url<a name="line.170"></a>
-<FONT color="green">171</FONT>             * @param arguments<a name="line.171"></a>
-<FONT color="green">172</FONT>             * @param indices<a name="line.172"></a>
-<FONT color="green">173</FONT>             * @param pattern<a name="line.173"></a>
-<FONT color="green">174</FONT>             * @return<a name="line.174"></a>
-<FONT color="green">175</FONT>             * @throws StickyWebNotInCacheException<a name="line.175"></a>
-<FONT color="green">176</FONT>             */<a name="line.176"></a>
-<FONT color="green">177</FONT>            boolean hasMore(String url, Map&lt;String, String&gt; arguments,<a name="line.177"></a>
-<FONT color="green">178</FONT>                            ArrayList&lt;String&gt; indices) throws StickyWebNotInCacheException {<a name="line.178"></a>
-<FONT color="green">179</FONT>                    String request = hashRequest(url, arguments, indices);<a name="line.179"></a>
-<FONT color="green">180</FONT>                    if (data.containsKey(request)) {<a name="line.180"></a>
-<FONT color="green">181</FONT>                            return data.get(request).hasMore();<a name="line.181"></a>
-<FONT color="green">182</FONT>                    } else {<a name="line.182"></a>
-<FONT color="green">183</FONT>                            throw new StickyWebNotInCacheException(request);<a name="line.183"></a>
-<FONT color="green">184</FONT>                    }<a name="line.184"></a>
-<FONT color="green">185</FONT>            }<a name="line.185"></a>
-<FONT color="green">186</FONT>    <a name="line.186"></a>
-<FONT color="green">187</FONT>            /**<a name="line.187"></a>
-<FONT color="green">188</FONT>             * Store this new list of outputs into the cache.<a name="line.188"></a>
-<FONT color="green">189</FONT>             * <a name="line.189"></a>
-<FONT color="green">190</FONT>             * @param key<a name="line.190"></a>
-<FONT color="green">191</FONT>             * @param value<a name="line.191"></a>
-<FONT color="green">192</FONT>             */<a name="line.192"></a>
-<FONT color="green">193</FONT>            private void put(String key, ArrayList&lt;String&gt; value) {<a name="line.193"></a>
-<FONT color="green">194</FONT>                    data.put(key, new Output(value));<a name="line.194"></a>
-<FONT color="green">195</FONT>            }<a name="line.195"></a>
-<FONT color="green">196</FONT>    }<a name="line.196"></a>
+<FONT color="green">097</FONT>                                    ArrayList values = (ArrayList) es.getValue();<a name="line.97"></a>
+<FONT color="green">098</FONT>                                    if (values.size() == 0) {<a name="line.98"></a>
+<FONT color="green">099</FONT>                                            this.data.put(es.getKey(), new Output(new ArrayList&lt;String&gt;()));<a name="line.99"></a>
+<FONT color="green">100</FONT>                                    } else if (values.size() == 1 &amp;&amp; values.get(0) instanceof String) {<a name="line.100"></a>
+<FONT color="green">101</FONT>                                            this.data.put(es.getKey(), new Output((ArrayList&lt;String&gt;) values.get(0)));<a name="line.101"></a>
+<FONT color="green">102</FONT>                                    } else {<a name="line.102"></a>
+<FONT color="green">103</FONT>                                            Output newOutput = new Output(Pattern.valueOf(values.get(0).toString().toUpperCase()));<a name="line.103"></a>
+<FONT color="green">104</FONT>                                            for (Object o : values.subList(1, values.size())) {<a name="line.104"></a>
+<FONT color="green">105</FONT>                                                    if (o == null) {<a name="line.105"></a>
+<FONT color="green">106</FONT>                                                            throw new StickyWebDataSourceParseException(<a name="line.106"></a>
+<FONT color="green">107</FONT>                                                                            "Input "<a name="line.107"></a>
+<FONT color="green">108</FONT>                                                                                            + es.getValue()<a name="line.108"></a>
+<FONT color="green">109</FONT>                                                                                            + " does not have a list of strings. One of the elements is null.");<a name="line.109"></a>
+<FONT color="green">110</FONT>                                                    } else if (!(o instanceof String)) {<a name="line.110"></a>
+<FONT color="green">111</FONT>                                                            throw new StickyWebDataSourceParseException(<a name="line.111"></a>
+<FONT color="green">112</FONT>                                                                            "Input "<a name="line.112"></a>
+<FONT color="green">113</FONT>                                                                                            + es.getValue()<a name="line.113"></a>
+<FONT color="green">114</FONT>                                                                                            + " does not have a list of strings. One of the elements is "<a name="line.114"></a>
+<FONT color="green">115</FONT>                                                                                            + o.getClass() + " (" + o + ").");<a name="line.115"></a>
+<FONT color="green">116</FONT>                                                    }<a name="line.116"></a>
+<FONT color="green">117</FONT>                                                    newOutput.add(o.toString());<a name="line.117"></a>
+<FONT color="green">118</FONT>                                            }<a name="line.118"></a>
+<FONT color="green">119</FONT>                                            this.data.put(es.getKey(), newOutput);<a name="line.119"></a>
+<FONT color="green">120</FONT>                                    }<a name="line.120"></a>
+<FONT color="green">121</FONT>                            } else {<a name="line.121"></a>
+<FONT color="green">122</FONT>                                    throw new StickyWebDataSourceParseException("Input "<a name="line.122"></a>
+<FONT color="green">123</FONT>                                                    + es.getValue() + " does not have a list of strings.");<a name="line.123"></a>
+<FONT color="green">124</FONT>                            }<a name="line.124"></a>
+<FONT color="green">125</FONT>                    }<a name="line.125"></a>
+<FONT color="green">126</FONT>            }<a name="line.126"></a>
+<FONT color="green">127</FONT>    <a name="line.127"></a>
+<FONT color="green">128</FONT>            /**<a name="line.128"></a>
+<FONT color="green">129</FONT>             * Given a URL and its arguments, convert it to a hashable request FIXME: I<a name="line.129"></a>
+<FONT color="green">130</FONT>             * strongly suspect that this is insufficient. If anyone knows of a better<a name="line.130"></a>
+<FONT color="green">131</FONT>             * library to uniformly hash requests, please let me know.<a name="line.131"></a>
+<FONT color="green">132</FONT>             * <a name="line.132"></a>
+<FONT color="green">133</FONT>             * @param url<a name="line.133"></a>
+<FONT color="green">134</FONT>             * @param query_arguments<a name="line.134"></a>
+<FONT color="green">135</FONT>             * @param indices<a name="line.135"></a>
+<FONT color="green">136</FONT>             * @return<a name="line.136"></a>
+<FONT color="green">137</FONT>             */<a name="line.137"></a>
+<FONT color="green">138</FONT>            public static String hashRequest(String url,<a name="line.138"></a>
+<FONT color="green">139</FONT>                            Map&lt;String, String&gt; query_arguments, ArrayList&lt;String&gt; indices) {<a name="line.139"></a>
+<FONT color="green">140</FONT>                    StringBuilder completeQuery = new StringBuilder(url);<a name="line.140"></a>
+<FONT color="green">141</FONT>                    completeQuery.append("?");<a name="line.141"></a>
+<FONT color="green">142</FONT>                    if (!indices.isEmpty() || (indices == null &amp;&amp; query_arguments != null)) {<a name="line.142"></a>
+<FONT color="green">143</FONT>                            ArrayList&lt;String&gt; actualIndices;<a name="line.143"></a>
+<FONT color="green">144</FONT>                            if (indices == null) {<a name="line.144"></a>
+<FONT color="green">145</FONT>                                    actualIndices = new ArrayList&lt;String&gt;(query_arguments.keySet());<a name="line.145"></a>
+<FONT color="green">146</FONT>                            } else {<a name="line.146"></a>
+<FONT color="green">147</FONT>                                    actualIndices = indices;<a name="line.147"></a>
+<FONT color="green">148</FONT>                            }<a name="line.148"></a>
+<FONT color="green">149</FONT>                            for (String key : actualIndices) {<a name="line.149"></a>
+<FONT color="green">150</FONT>                                    completeQuery<a name="line.150"></a>
+<FONT color="green">151</FONT>                                                    .append(key + "=" + query_arguments.get(key) + "&amp;");<a name="line.151"></a>
+<FONT color="green">152</FONT>                            }<a name="line.152"></a>
+<FONT color="green">153</FONT>                            // Remove any trailing &amp;<a name="line.153"></a>
+<FONT color="green">154</FONT>                            if (!indices.isEmpty()) {<a name="line.154"></a>
+<FONT color="green">155</FONT>                                    completeQuery.deleteCharAt(completeQuery.length() - 1);<a name="line.155"></a>
+<FONT color="green">156</FONT>                            }<a name="line.156"></a>
+<FONT color="green">157</FONT>                    }<a name="line.157"></a>
+<FONT color="green">158</FONT>                    return completeQuery.toString();<a name="line.158"></a>
+<FONT color="green">159</FONT>            }<a name="line.159"></a>
+<FONT color="green">160</FONT>    <a name="line.160"></a>
+<FONT color="green">161</FONT>            /**<a name="line.161"></a>
+<FONT color="green">162</FONT>             * Retrieves an element from the LocalCache.<a name="line.162"></a>
+<FONT color="green">163</FONT>             * <a name="line.163"></a>
+<FONT color="green">164</FONT>             * @param url<a name="line.164"></a>
+<FONT color="green">165</FONT>             * @param arguments<a name="line.165"></a>
+<FONT color="green">166</FONT>             * @param indices<a name="line.166"></a>
+<FONT color="green">167</FONT>             * @return<a name="line.167"></a>
+<FONT color="green">168</FONT>             * @throws StickyWebNotInCacheException<a name="line.168"></a>
+<FONT color="green">169</FONT>             *             if the element is not in the cache.<a name="line.169"></a>
+<FONT color="green">170</FONT>             */<a name="line.170"></a>
+<FONT color="green">171</FONT>            String get(String url, Map&lt;String, String&gt; arguments,<a name="line.171"></a>
+<FONT color="green">172</FONT>                            ArrayList&lt;String&gt; indices) throws StickyWebNotInCacheException {<a name="line.172"></a>
+<FONT color="green">173</FONT>                    String request = hashRequest(url, arguments, indices);<a name="line.173"></a>
+<FONT color="green">174</FONT>                    if (data.containsKey(request)) {<a name="line.174"></a>
+<FONT color="green">175</FONT>                            return data.get(request).get();<a name="line.175"></a>
+<FONT color="green">176</FONT>                    } else {<a name="line.176"></a>
+<FONT color="green">177</FONT>                            throw new StickyWebNotInCacheException(request);<a name="line.177"></a>
+<FONT color="green">178</FONT>                    }<a name="line.178"></a>
+<FONT color="green">179</FONT>            }<a name="line.179"></a>
+<FONT color="green">180</FONT>    <a name="line.180"></a>
+<FONT color="green">181</FONT>            /**<a name="line.181"></a>
+<FONT color="green">182</FONT>             * Returns whether there are more elements for this request.<a name="line.182"></a>
+<FONT color="green">183</FONT>             * <a name="line.183"></a>
+<FONT color="green">184</FONT>             * @param url<a name="line.184"></a>
+<FONT color="green">185</FONT>             * @param arguments<a name="line.185"></a>
+<FONT color="green">186</FONT>             * @param indices<a name="line.186"></a>
+<FONT color="green">187</FONT>             * @param pattern<a name="line.187"></a>
+<FONT color="green">188</FONT>             * @return<a name="line.188"></a>
+<FONT color="green">189</FONT>             * @throws StickyWebNotInCacheException<a name="line.189"></a>
+<FONT color="green">190</FONT>             */<a name="line.190"></a>
+<FONT color="green">191</FONT>            boolean hasMore(String url, Map&lt;String, String&gt; arguments,<a name="line.191"></a>
+<FONT color="green">192</FONT>                            ArrayList&lt;String&gt; indices) throws StickyWebNotInCacheException {<a name="line.192"></a>
+<FONT color="green">193</FONT>                    String request = hashRequest(url, arguments, indices);<a name="line.193"></a>
+<FONT color="green">194</FONT>                    if (data.containsKey(request)) {<a name="line.194"></a>
+<FONT color="green">195</FONT>                            return data.get(request).hasMore();<a name="line.195"></a>
+<FONT color="green">196</FONT>                    } else {<a name="line.196"></a>
+<FONT color="green">197</FONT>                            throw new StickyWebNotInCacheException(request);<a name="line.197"></a>
+<FONT color="green">198</FONT>                    }<a name="line.198"></a>
+<FONT color="green">199</FONT>            }<a name="line.199"></a>
+<FONT color="green">200</FONT>    }<a name="line.200"></a>
 
 
 

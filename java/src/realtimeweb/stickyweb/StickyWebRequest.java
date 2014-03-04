@@ -1,7 +1,5 @@
 package realtimeweb.stickyweb;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -10,6 +8,8 @@ import org.scribe.oauth.OAuthService;
 
 import realtimeweb.stickyweb.exceptions.StickyWebDataSourceNotFoundException;
 import realtimeweb.stickyweb.exceptions.StickyWebInternetException;
+import realtimeweb.stickyweb.exceptions.StickyWebInvalidPostArguments;
+import realtimeweb.stickyweb.exceptions.StickyWebInvalidQueryString;
 import realtimeweb.stickyweb.exceptions.StickyWebNotInCacheException;
 
 /**
@@ -92,15 +92,14 @@ public class StickyWebRequest {
 	 * local cache.
 	 * 
 	 * @return
-	 * @throws IllegalStateException
-	 * @throws IOException
-	 * @throws URISyntaxException
 	 * @throws StickyWebNotInCacheException
 	 * @throws StickyWebInternetException
+	 * @throws StickyWebInvalidQueryString
+	 * @throws StickyWebInvalidPostArguments
 	 */
 	public synchronized StickyWebResponse execute()
-			throws IllegalStateException, IOException, URISyntaxException,
-			StickyWebNotInCacheException, StickyWebInternetException {
+			throws StickyWebNotInCacheException, StickyWebInternetException,
+			StickyWebInvalidQueryString, StickyWebInvalidPostArguments {
 		if (online) {
 			switch (protocol) {
 			default:

@@ -10,8 +10,12 @@ class Output {
 	 */
 	Output(ArrayList<String> value) {
 		clock = 0;
-		pattern = Pattern.valueOf(value.get(0));
-		data = value.subList(1, value.size()-1);
+		pattern = Pattern.valueOf(value.get(0).toUpperCase());
+		if (value.size() == 1) {
+			data = new ArrayList<String>();
+		} else {
+			data = value.subList(1, value.size()-1);
+		}
 	}
 	private List<String> data;
 	private int clock;
@@ -46,6 +50,13 @@ class Output {
 		this.data = data;
 	}
 
+	public Output(String data) {
+		this.clock = 0;
+		this.pattern = Pattern.REPEAT;
+		this.data = new ArrayList<String>();
+		this.data.add(data);
+	}
+
 	/**
 	 * Returns the current data, based on the clock. If there is no more data,
 	 * then the result is returned based on the pattern:<ul>
@@ -57,6 +68,9 @@ class Output {
 	 * @return
 	 */
 	String get() {
+		if (data.size() == 0) {
+			return null;
+		}
 		if (!hasMore()) {
 			switch (pattern) {
 			case EMPTY:
@@ -107,5 +121,9 @@ class Output {
 		ArrayList<String> output = new ArrayList<String>(this.data);
 		output.add(0, this.pattern.toString().toLowerCase());
 		return output;
+	}
+
+	public void add(String data) {
+		this.data.add(data);
 	}
 }

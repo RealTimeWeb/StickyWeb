@@ -12,34 +12,45 @@ import org.junit.Test;
 
 import realtimeweb.stickyweb.StickyWeb;
 import realtimeweb.stickyweb.StickyWebResponse;
+import realtimeweb.stickyweb.exceptions.StickyWebDataSourceNotFoundException;
+import realtimeweb.stickyweb.exceptions.StickyWebInternetException;
+import realtimeweb.stickyweb.exceptions.StickyWebInvalidPostArguments;
+import realtimeweb.stickyweb.exceptions.StickyWebInvalidQueryString;
+import realtimeweb.stickyweb.exceptions.StickyWebJsonResponseParseException;
+import realtimeweb.stickyweb.exceptions.StickyWebNotInCacheException;
 
 public class Oauth1Test {
 
 	@Test
 	public void test() {
 		StickyWeb sw = new StickyWeb();
-		try {
 			Map<String, String> parameters = new HashMap<String, String>();
 			parameters.put("location", "blacksburg");
-			StickyWebResponse result = sw
-					.get("http://api.yelp.com/v2/search", parameters).setOnline(true)
-					.execute();
-			System.out.println(result.asJSON());
-			// System.out.println((TagNode)comicObj);
-			// System.out.println(((org.htmlcleaner.TagNode)comicObj).getAttributeByName("src"));
-		} catch (IllegalStateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			StickyWebResponse result;
+			try {
+				result = sw
+						.get("http://api.yelp.com/v2/search", parameters).setOnline(true)
+						.execute();
+				System.out.println(result.asJSON());
+			} catch (StickyWebNotInCacheException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (StickyWebInternetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (StickyWebInvalidQueryString e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (StickyWebInvalidPostArguments e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (StickyWebDataSourceNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (StickyWebJsonResponseParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	}
 
 }
