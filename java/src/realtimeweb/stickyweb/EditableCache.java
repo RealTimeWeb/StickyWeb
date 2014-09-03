@@ -1,5 +1,6 @@
 package realtimeweb.stickyweb;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -11,9 +12,21 @@ import org.json.simple.JSONValue;
 
 import realtimeweb.stickyweb.exceptions.StickyWebDataSourceNotFoundException;
 import realtimeweb.stickyweb.exceptions.StickyWebDataSourceParseException;
+import realtimeweb.stickyweb.exceptions.StickyWebInternetException;
+import realtimeweb.stickyweb.exceptions.StickyWebInvalidPostArguments;
+import realtimeweb.stickyweb.exceptions.StickyWebInvalidQueryString;
 import realtimeweb.stickyweb.exceptions.StickyWebLoadDataSourceException;
+import realtimeweb.stickyweb.exceptions.StickyWebNotInCacheException;
 
 public class EditableCache extends LocalCache {
+	
+	public EditableCache(InputStream cache) throws StickyWebDataSourceNotFoundException, StickyWebDataSourceParseException, StickyWebLoadDataSourceException {
+		super(cache);
+	}
+	
+	public EditableCache() {
+		super();
+	}
 
 	/**
 	 * Sets the pattern for this particular key.
@@ -83,6 +96,10 @@ public class EditableCache extends LocalCache {
 		} else {
 			this.data.put(key, new Output(data));
 		}
+	}
+	
+	public void addData(StickyWebRequest request) throws StickyWebNotInCacheException, StickyWebInternetException, StickyWebInvalidQueryString, StickyWebInvalidPostArguments {
+		this.addData(request.getHashedRequest(), request.execute().asText());
 	}
 
 	/**
