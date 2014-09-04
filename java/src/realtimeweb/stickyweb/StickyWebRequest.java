@@ -1,7 +1,14 @@
 package realtimeweb.stickyweb;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.scribe.model.Token;
 import org.scribe.oauth.OAuthService;
@@ -100,26 +107,54 @@ public class StickyWebRequest {
 	public synchronized StickyWebResponse execute()
 			throws StickyWebNotInCacheException, StickyWebInternetException,
 			StickyWebInvalidQueryString, StickyWebInvalidPostArguments {
-		if (online) {
-			switch (protocol) {
-			default:
-			case GET:
-				return new StickyWebResponse(WebConnection.get(url, arguments,
-						service, accessToken));
-			case POST:
-				return new StickyWebResponse(WebConnection.post(url, arguments,
-						service, accessToken));
-			case PUT:
-				return new StickyWebResponse(WebConnection.put(url, arguments,
-						service, accessToken));
-			case DELETE:
-				return new StickyWebResponse(WebConnection.delete(url,
-						arguments, service, accessToken));
+
+		if (this.online)
+		{
+			Callable<StickyWebResponse> thunk = new Callable<StickyWebResponse>() {
+
+				public StickyWebResponse call()
+						throws StickyWebInternetException, StickyWebInvalidQueryString, StickyWebInvalidPostArguments
+						{
+					switch (protocol)
+					{ 
+					default:
+					case GET:
+						return new StickyWebResponse(WebConnection.get(url, arguments,
+								service, accessToken));
+					case POST:
+						return new StickyWebResponse(WebConnection.post(url, arguments,
+								service, accessToken));
+					case PUT:
+						return new StickyWebResponse(WebConnection.put(url, arguments,
+								service, accessToken));
+					case DELETE:
+						return new StickyWebResponse(WebConnection.delete(url,
+								arguments, service, accessToken));
+					}
+				}
+			};
+
+
+
+			ExecutorService pool = Executors.newFixedThreadPool(3);
+			Set<Future<StickyWebResponse>> set = new HashSet<Future<StickyWebResponse>>();
+			Future<StickyWebResponse> future = pool.submit(thunk);
+			try
+			{
+				return (StickyWebResponse)future.get();
 			}
-		} else {
-			return new StickyWebResponse(
-					cache.get(url, arguments, this.indices));
+			catch (InterruptedException e)
+			{
+				System.out.println("Failed to complete the HTTP request - unknown interuption");
+			}
+			catch (ExecutionException e)
+			{
+				System.out.println("Failed to complete the HTTP request - exeuction interruption");
+			}
+			return null;
 		}
+		return new StickyWebResponse(
+				this.cache.get(this.url, this.arguments, this.indices));
 	}
 
 	/**
